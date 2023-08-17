@@ -25,6 +25,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e3422fb7-eba0-4905-88e4-85249f2f6e2d"
+      }
+    },
+    "owner": "markokrajceski",
+    "plugins": [
+      "expo-localization"
+    ]
   }
 }
