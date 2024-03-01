@@ -2,30 +2,34 @@ import { Text, View, TouchableOpacity } from "react-native";
 import styles from "../helpers/styles";
 import { useEffect, useState } from "react";
 import getQuestion from "../helpers/getQuestion";
-import SwipeCards from "../helpers/react-native-swipe-cards-deck";
+import SwipeCards from "../components/SwipeCards";
 import Card from "../components/Card";
 import StatusCard from "../components/StatusCard";
 import FlipCard from "../components/FlipCard";
 
 export default function QuestionResultsScreen({ route, navigation }) {
   const { language, questionType, topic } = route.params;
+  const isQuiz = questionType.quiz == "quiz";
   const [refreshKey, setRefreshKey] = useState(0);
   const [refreshData, setRefreshData] = useState(0);
 
   const [questions, setQuestions] = useState([]);
   const [incorrectIndexes, setIncorrectIndexes] = useState([]);
 
-  const [correctCounter, setCorretCounter] = useState(0);
+  const [correctCounter, setCorrectCounter] = useState(0);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let questionsRes = await getQuestion(
+        const questionsRes = await getQuestion(
           language,
           questionType.type,
           topic,
           questionType.answers
         );
         setQuestions(questionsRes);
+        setRefreshKey(refreshKey+ 1)
+        setCorrectCounter(0);
+        setIncorrectIndexes([]);
       } catch (error) {
         console.error(error);
       }
@@ -35,34 +39,46 @@ export default function QuestionResultsScreen({ route, navigation }) {
   }, [refreshData]);
 
   function handleYup(card) {
-    if (questionType.quiz == "quiz") {
+    if (isQuiz) {
       if (card.answer == "Yes") {
-        setCorretCounter(correctCounter + 1);
+        setCorrectCounter(correctCounter + 1);
+        console.log(correctCounter);
+        return false;
       } else {
         setIncorrectIndexes([...incorrectIndexes, questions.indexOf(card)]);
+        console.log(correctCounter);
+        return false;
       }
     }
-    return true;
+    return false;
   }
   function handleNope(card) {
-    if (questionType.quiz == "quiz") {
+    if (isQuiz) {
       if (card.answer == "No") {
-        setCorretCounter(correctCounter + 1);
+        setCorrectCounter(correctCounter + 1);
+        console.log(correctCounter);
+        return false;
       } else {
         setIncorrectIndexes([...incorrectIndexes, questions.indexOf(card)]);
+        console.log(correctCounter);
+        return false;
       }
     }
-    return true;
+    return false;
   }
   const handleRefresh = () => {
+    console.log(correctCounter);
     setRefreshKey(refreshKey + 1);
-    setCorretCounter(0);
+    setCorrectCounter(0);
+    setIncorrectIndexes([])
   };
 
   const handleReload = () => {
+    setQuestions([])
+    console.log(correctCounter);
     setRefreshData(refreshData + 1);
-    // setRefreshKey(refreshKey + 1);
-    setCorretCounter(0);
+    setCorrectCounter(0);
+    setIncorrectIndexes([])
   };
 
   return (
@@ -71,6 +87,7 @@ export default function QuestionResultsScreen({ route, navigation }) {
         <SwipeCards
           key={refreshKey}
           cards={questions}
+          isFlip={questionType.quiz == "flip"}
           renderCard={(cardData) =>
             questionType.quiz == "flip" ? (
               <FlipCard data={{ ...cardData, border: "black" }} />
@@ -80,7 +97,7 @@ export default function QuestionResultsScreen({ route, navigation }) {
           }
           keyExtractor={(cardData) => String(cardData.question)}
           renderNoMoreCards={() =>
-            questionType.quiz == "quiz" ? (
+            isQuiz ? (
               <>
                 <StatusCard text={`Result :${correctCounter}/10`} />
                 <TouchableOpacity
@@ -124,11 +141,9 @@ export default function QuestionResultsScreen({ route, navigation }) {
               </>
             )
           }
-          actions={{
-            nope: { onAction: handleNope },
-            yup: { onAction: handleYup },
-          }}
-          neutral={questionType.quiz != "quiz"}
+          handleNope={handleNope}
+          handleYup={handleYup}
+          neutral={!isQuiz}
         />
       ) : (
         <StatusCard text="Loading..." />

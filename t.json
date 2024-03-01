@@ -1,0 +1,26 @@
+{
+  "questions": [
+    { "answer": "Yes", "question": "Is 7 an odd number?" },
+    { "answer": "No", "question": "Is 5 divided by 0 equal to infinity?" },
+    { "answer": "No", "question": "Is the square root of 16 equal to 5?" },
+    { "answer": "Yes", "question": "Is 7 a prime number?" },
+    { "answer": "Yes", "question": "Is zero an even number?" },
+    { "answer": "Yes", "question": "Is pi an irrational number?" },
+    {
+      "answer": "Yes",
+      "question": "Is a triangle with sides of lengths 3, 4, and 5 a right triangle?"
+    },
+    {
+      "answer": "Yes",
+      "question": "Is the sum of the angles in a triangle equal to 180 degrees?"
+    },
+    {
+      "answer": "Yes",
+      "question": "Is a quadratic equation always in the form of ax^2 + bx + c = 0?"
+    },
+    {
+      "answer": "Yes",
+      "question": "Is the product of any two negative numbers always positive?"
+    }
+  ]
+}

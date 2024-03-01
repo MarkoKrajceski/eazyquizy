@@ -6,7 +6,11 @@ export default function Card({ data }) {
     <View
       style={[
         styles.card,
-        { backgroundColor: "white", borderColor: data.border, borderWidth: 2 },
+        {
+          backgroundColor: data.backgroundColor,
+          borderColor: data.border,
+          borderWidth: 2,
+        },
       ]}
     >
       <Text>{data.question}</Text>

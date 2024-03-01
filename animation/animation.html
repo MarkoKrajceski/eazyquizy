@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    svg {
+      display: block;
+      margin: 20px auto;
+    }
+
+    text {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      text-anchor: middle;
+      fill: #333;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    line {
+      stroke: #333;
+      stroke-width: 2;
+      opacity: 0;
+      animation: fadeInLine 1s forwards;
+    }
+
+    @keyframes fadeInLine {
+      to {
+        opacity: 1;
+      }
+    }
+
+    circle {
+      fill: #61dafb;
+      opacity: 0;
+      animation: fadeInCircle 1s forwards;
+    }
+
+    @keyframes fadeInCircle {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .expo-logo {
+      fill: #4630eb;
+      opacity: 0;
+      animation: fadeInExpoLogo 1s forwards;
+    }
+
+    @keyframes fadeInExpoLogo {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg height="200" width="400">
+    <!-- Objective C/Swift -->
+    <text x="50" y="30">Objective C/Swift</text>
+    <!-- Java/Kotlin -->
+    <text x="200" y="30">Java/Kotlin</text>
+    <!-- HTML -->
+    <text x="350" y="30">HTML</text>
+
+    <!-- Arrows -->
+    <line x1="50" y1="50" x2="100" y2="100" class="arrow-line" />
+    <line x1="200" y1="50" x2="100" y2="100" class="arrow-line" />
+    <line x1="350" y1="50" x2="100" y2="100" class="arrow-line" />
+
+    <!-- React Native Logo -->
+    <circle cx="100" cy="100" r="40" class="react-native-logo" />
+
+    <!-- React Native Deployment Icons -->
+    <text x="50" y="180">iOS</text>
+    <text x="200" y="180">Android</text>
+    <text x="350" y="180">Web</text>
+
+    <!-- Expo Logo -->
+    <circle cx="100" cy="100" r="40" class="expo-logo"></circle>
+  </svg>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Get the SVG elements
+      const arrowLines = document.querySelectorAll('.arrow-line');
+      const reactNativeLogo = document.querySelector('.react-native-logo');
+      const expoLogo = document.querySelector('.expo-logo');
+
+      // Trigger animations
+      arrowLines.forEach((line, index) => {
+        line.style.animationDelay = `${index * 0.5}s`;
+      });
+
+      reactNativeLogo.style.animationDelay = '1.5s';
+      expoLogo.style.animationDelay = '3s';
+    });
+  </script>
+</body>
+</html>

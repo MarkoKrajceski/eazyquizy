@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TouchableOpacity, Animated } from "react-native";
 import styles from "../helpers/styles";
 
 export default function FlipCard({ data }) {
@@ -48,14 +42,14 @@ export default function FlipCard({ data }) {
         toValue: 0,
         friction: 8,
         tension: 10,
-        useNativeDriver: true
+        useNativeDriver: true,
       }).start();
     } else {
       Animated.spring(animatedValue, {
         toValue: 180,
         friction: 8,
         tension: 10,
-        useNativeDriver: true
+        useNativeDriver: true,
       }).start();
     }
   };
@@ -72,7 +66,11 @@ export default function FlipCard({ data }) {
     <TouchableOpacity
       style={[
         styles.card,
-        { backgroundColor: "white", borderColor: data.border, borderWidth: 2 },
+        {
+          backgroundColor: data.backgroundColor,
+          borderColor: data.border,
+          borderWidth: 2,
+        },
       ]}
       onPress={flipCard}
     >

@@ -5,7 +5,7 @@ import styles from "../helpers/styles";
 import getContrastColor from "../helpers/getContrastColor";
 import { useEffect, useState } from "react";
 import getQuestion from "../helpers/getQuestion";
-import SwipeCards from "../helpers/react-native-swipe-cards-deck";
+import SwipeCards from "../components/SwipeCards";
 import Card from "../components/Card";
 import StatusCard from "../components/StatusCard";
 

@@ -34,6 +34,10 @@ export default styles = StyleSheet.create({
     alignItems: "center",
     width: 300,
     height: 300,
+    borderTopStartRadius: 80,
+    borderTopEndRadius: 20,
+    borderBottomStartRadius: 20,
+    borderBottomEndRadius: 80,
   },
   cardsText: {
     fontSize: 22,
