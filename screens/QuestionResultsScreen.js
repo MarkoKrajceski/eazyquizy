@@ -99,7 +99,7 @@ export default function QuestionResultsScreen({ route, navigation }) {
           renderNoMoreCards={() =>
             isQuiz ? (
               <>
-                <StatusCard text={`Result :${correctCounter}/10`} />
+                <StatusCard text={`Result: ${correctCounter}/10`} />
                 <TouchableOpacity
                   style={{ ...styles.button }}
                   onPress={() => {
