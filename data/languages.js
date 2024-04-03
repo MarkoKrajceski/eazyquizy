@@ -4,8 +4,8 @@ export default languages = [
     hexColors: ["#012169", "#FFFFFF", "#C8102E"], // Red
   },
   {
-    language: "Mandarin Chinese",
-    hexColors: ["#DE2910", "#FFDE00"], // Chinese Flag Red
+    language: "Macedonian",
+    hexColors: ["#D20000", "#FFE500"], // Macedonian Flag Red, Yellow
   },
   {
     language: "Spanish",
@@ -18,6 +18,10 @@ export default languages = [
   {
     language: "Arabic",
     hexColors: ["#007A3D", "#FFFFFF"], // Green (representing Arab League), White
+  },
+  {
+    language: "Mandarin Chinese",
+    hexColors: ["#DE2910", "#FFDE00"], // Chinese Flag Red
   },
   {
     language: "Bengali",
@@ -102,10 +106,6 @@ export default languages = [
   {
     language: "Romanian",
     hexColors: ["#002B7F", "#FCD116"], // Romanian Flag Blue, Yellow
-  },
-  {
-    language: "Macedonian",
-    hexColors: ["#D20000", "#FFE500"], // Macedonian Flag Red, Yellow
   },
   {
     language: "Greek",

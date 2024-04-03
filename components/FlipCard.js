@@ -16,12 +16,12 @@ export default function FlipCard({ data }) {
     };
   }, []);
 
-  const frontInterpolate = animatedValue.interpolate({
+  const interpolateFront = animatedValue.interpolate({
     inputRange: [0, 180],
     outputRange: ["0deg", "180deg"],
   });
 
-  const backInterpolate = animatedValue.interpolate({
+  const interpolateBack = animatedValue.interpolate({
     inputRange: [0, 180],
     outputRange: ["180deg", "360deg"],
   });
@@ -54,18 +54,18 @@ export default function FlipCard({ data }) {
     }
   };
 
-  const frontAnimatedStyle = {
-    transform: [{ rotateY: frontInterpolate }],
-  };
-
-  const backAnimatedStyle = {
-    transform: [{ rotateY: backInterpolate }],
+  const cardAnimatedStyle = {
+    transform: [
+      // Apply rotation based on the side of the card
+      { rotateY: value >= 90 ? interpolateBack : interpolateFront },
+    ],
   };
 
   return (
     <TouchableOpacity
       style={[
         styles.card,
+        cardAnimatedStyle,
         {
           backgroundColor: data.backgroundColor,
           borderColor: data.border,
@@ -73,15 +73,14 @@ export default function FlipCard({ data }) {
         },
       ]}
       onPress={flipCard}
+      activeOpacity={1}
     >
-      <View>
-        <Animated.View style={[frontAnimatedStyle, { opacity: frontOpacity }]}>
-          <Text>{data.question}</Text>
-        </Animated.View>
-        <Animated.View style={[backAnimatedStyle, { opacity: backOpacity }]}>
-          <Text>{data.answer}</Text>
-        </Animated.View>
-      </View>
+      <Animated.View style={{ opacity: frontOpacity }}>
+        <Text>{data.question}</Text>
+      </Animated.View>
+      <Animated.View style={[{ position: 'absolute' }, { opacity: backOpacity }]}>
+        <Text>{data.answer}</Text>
+      </Animated.View>
     </TouchableOpacity>
   );
 }
