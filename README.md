@@ -1,8 +1,10 @@
-This application is a react native expo project.
+> ⚠️ **This repository is archived.** It was built on Expo SDK 50 and is no longer maintained.
+> The app has been fully rewritten — see the new version at [eazyquizy-clean](https://github.com/MarkoKrajceski/eazyquizy-clean).
 
-To run the app you need to have Expo Go installed on your mobile device.
+---
 
-After cloning the project:
-1. Run npm install in the root
-3. Run npm run start
-4. Open Expo Go and scan the QR or open the local server link
+# EazyQuizy (legacy)
+
+A React Native quiz app powered by the Claude AI API. Generates quiz cards on any topic in any language.
+
+Built with Expo SDK 50 / Expo Go.
