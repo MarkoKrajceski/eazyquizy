@@ -1,7 +1,7 @@
 import { Text, View, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
-import { LinearGradient } from "expo-linear-gradient";
-import styles from "../helpers/styles";
+import { Ionicons } from "@expo/vector-icons";
+import styles, { COLORS } from "../helpers/styles";
 import questionTypes from "../data/questionTypes";
 
 export default function QuestionTypePickerScreen({ route, navigation }) {
@@ -11,35 +11,30 @@ export default function QuestionTypePickerScreen({ route, navigation }) {
     <FlashList
       data={questionTypes}
       renderItem={({ item }) => (
-        <View style={styles.buttonContainer}>
-          <LinearGradient
-            colors={["#FFFFFF", "#FFFFFF"]}
-            // style={styles.background}
-            start={{ x: 0, y: 0.75 }}
-            end={{ x: 1, y: 0.25 }}
-            style={styles.button}
-          >
-            <TouchableOpacity
-              style={{ ...styles.button }}
-              onPress={() => {
-                navigation.navigate("TopicPickerScreen", {
-                  language: language,
-                  questionType: item,
-                });
-              }}
-            >
-              <Text
-                style={{
-                  ...styles.buttonTextSmall,
-                }}
-              >
-                {item.type}
-              </Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
+        <TouchableOpacity
+          style={styles.pickerRow}
+          onPress={() =>
+            navigation.navigate("TopicPickerScreen", {
+              language,
+              questionType: item,
+            })
+          }
+          activeOpacity={0.7}
+        >
+          <View style={styles.pickerIconBox}>
+            <Ionicons name={item.icon} size={22} color={COLORS.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.pickerRowTitle}>{item.type}</Text>
+            {item.description ? (
+              <Text style={styles.pickerRowSub}>{item.description}</Text>
+            ) : null}
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
+        </TouchableOpacity>
       )}
-      estimatedItemSize={questionTypes.length}
+      estimatedItemSize={70}
+      contentContainerStyle={styles.listContent}
     />
   );
 }
