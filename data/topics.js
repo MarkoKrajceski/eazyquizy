@@ -1,32 +1,14 @@
-export default topics = [
-  {
-    topic: "Mathematics",
-  },
-  {
-    topic: "English Literature",
-  },
-  {
-    topic: "Macedonian Literature",
-  },
-  {
-    topic: "Physics",
-  },
-  {
-    topic: "Chemistry",
-  },
-  {
-    topic: "Biology",
-  },
-  {
-    topic: "History",
-  },
-  {
-    topic: "Computer Science",
-  },
-  {
-    topic: "Physical Education",
-  },
-  {
-    topic: "Art",
-  },
+export default [
+  { topic: "Mathematics", icon: "calculator" },
+  { topic: "English Literature", icon: "book" },
+  { topic: "World Literature", icon: "library" },
+  { topic: "Physics", icon: "flash" },
+  { topic: "Chemistry", icon: "flask" },
+  { topic: "Biology", icon: "leaf" },
+  { topic: "History", icon: "time" },
+  { topic: "Computer Science", icon: "code-slash" },
+  { topic: "Physical Education", icon: "football" },
+  { topic: "Art", icon: "color-palette" },
+  { topic: "Geography", icon: "earth" },
+  { topic: "Music", icon: "musical-notes" },
 ];

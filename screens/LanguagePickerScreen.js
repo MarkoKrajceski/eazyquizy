@@ -1,43 +1,46 @@
-import { Text, View, TouchableOpacity } from "react-native";
-import languages from "../data/languages";
+import { Text, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { LinearGradient } from "expo-linear-gradient";
 import styles from "../helpers/styles";
 import getContrastColor from "../helpers/getContrastColor";
+import languages from "../data/languages";
 
 export default function LanguagePickerScreen({ navigation }) {
   return (
     <FlashList
       data={languages}
       renderItem={({ item }) => (
-        <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("QuestionTypePickerScreen", {
+              language: item.language,
+            })
+          }
+          activeOpacity={0.75}
+          style={{ marginVertical: 5, marginHorizontal: 16 }}
+        >
           <LinearGradient
             colors={item.hexColors}
-            start={{ x: 0, y: 0.75 }}
-            end={{ x: 1, y: 0.25 }}
-            style={styles.button}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={[
+              styles.pickerRow,
+              { marginVertical: 0, marginHorizontal: 0, shadowOpacity: 0.1 },
+            ]}
           >
-            <TouchableOpacity
-              style={{ ...styles.button }}
-              onPress={() => {
-                navigation.navigate("QuestionTypePickerScreen", {
-                  language: item.language,
-                });
-              }}
+            <Text
+              style={[
+                styles.pickerRowTitle,
+                { color: getContrastColor(item.hexColors[Math.floor(item.hexColors.length / 2)]) },
+              ]}
             >
-              <Text
-                style={{
-                  ...styles.buttonTextSmall,
-                  color: getContrastColor(item.hexColors[1]),
-                }}
-              >
-                {item.language}
-              </Text>
-            </TouchableOpacity>
+              {item.language}
+            </Text>
           </LinearGradient>
-        </View>
+        </TouchableOpacity>
       )}
-      estimatedItemSize={languages.length}
+      estimatedItemSize={62}
+      contentContainerStyle={styles.listContent}
     />
   );
 }

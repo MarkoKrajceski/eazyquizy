@@ -1,61 +1,43 @@
 import { Text, View, TouchableOpacity } from "react-native";
-import { FlashList } from "@shopify/flash-list";
-import { LinearGradient } from "expo-linear-gradient";
-import styles from "../helpers/styles";
-import getContrastColor from "../helpers/getContrastColor";
-import { useEffect, useState } from "react";
-import getQuestion from "../helpers/getQuestion";
+import styles, { COLORS } from "../helpers/styles";
 import SwipeCards from "../components/SwipeCards";
 import Card from "../components/Card";
-import StatusCard from "../components/StatusCard";
 
 export default function QuizReviewScreen({ route, navigation }) {
   const { questions, incorrectIndexes } = route.params;
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  function handleYup(card) {
-    return true;
-  }
-  function handleNope(card) {
-    return true;
-  }
+  const correct = questions.length - incorrectIndexes.length;
 
   return (
     <View style={styles.container}>
-      {questions && questions.length ? (
+      {questions.length ? (
         <SwipeCards
-          key={refreshKey}
           cards={questions}
-          renderCard={(cardData) => (
-            <Card
-              data={{
-                ...cardData,
-                border: incorrectIndexes.includes(questions.indexOf(cardData))
-                  ? "red"
-                  : "green",
-              }}
-            />
-          )}
-          keyExtractor={(cardData) => String(cardData.question)}
-          renderNoMoreCards={() => (
-            <>
-              <TouchableOpacity
-                style={{ ...styles.button }}
-                onPress={navigation.goBack}
-              >
-                <Text>Go Back</Text>
-              </TouchableOpacity>
-            </>
-          )}
-          actions={{
-            nope: { onAction: handleNope },
-            yup: { onAction: handleYup },
+          renderCard={(cardData) => {
+            const idx = questions.indexOf(cardData);
+            const border = incorrectIndexes.includes(idx) ? "red" : "green";
+            return <Card data={{ ...cardData, border }} />;
           }}
+          handleYup={() => true}
+          handleNope={() => true}
           neutral={true}
+          renderNoMoreCards={() => (
+            <View style={{ alignItems: "center" }}>
+              <Text style={[styles.cardsText, { marginBottom: 8 }]}>
+                {correct}/{questions.length} correct
+              </Text>
+              <Text style={[styles.statusSubText, { marginBottom: 24 }]}>
+                Review complete
+              </Text>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={styles.buttonText}>Back to Results</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         />
-      ) : (
-        <StatusCard text="Loading..." />
-      )}
+      ) : null}
     </View>
   );
 }

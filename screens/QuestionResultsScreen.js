@@ -1,153 +1,205 @@
-import { Text, View, TouchableOpacity } from "react-native";
-import styles from "../helpers/styles";
-import { useEffect, useState } from "react";
+import { Text, View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import styles, { COLORS } from "../helpers/styles";
 import getQuestion from "../helpers/getQuestion";
 import SwipeCards from "../components/SwipeCards";
 import Card from "../components/Card";
-import StatusCard from "../components/StatusCard";
 import FlipCard from "../components/FlipCard";
 
 export default function QuestionResultsScreen({ route, navigation }) {
   const { language, questionType, topic } = route.params;
-  const isQuiz = questionType.quiz == "quiz";
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [refreshData, setRefreshData] = useState(0);
+  const isQuiz = questionType.quiz === "quiz";
+  const isFlip = questionType.quiz === "flip";
 
   const [questions, setQuestions] = useState([]);
+  const [loadError, setLoadError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [loadTrigger, setLoadTrigger] = useState(0);
+
+  // Refs avoid stale-closure issues inside swipe handlers
+  const correctRef = useRef(0);
+  const incorrectRef = useRef([]);
+  // Mirror into state only for the result render
+  const [correctCount, setCorrectCount] = useState(0);
   const [incorrectIndexes, setIncorrectIndexes] = useState([]);
 
-  const [correctCounter, setCorrectCounter] = useState(0);
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const questionsRes = await getQuestion(
-          language,
-          questionType.type,
-          topic,
-          questionType.answers
-        );
-        setQuestions(questionsRes);
-        setRefreshKey(refreshKey+ 1)
-        setCorrectCounter(0);
-        setIncorrectIndexes([]);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    let cancelled = false;
+    setQuestions([]);
+    setLoadError(null);
+    correctRef.current = 0;
+    incorrectRef.current = [];
+    setCorrectCount(0);
+    setIncorrectIndexes([]);
 
-    fetchData();
-  }, [refreshData]);
+    getQuestion(language, questionType.type, topic, questionType.answers)
+      .then((result) => {
+        if (!cancelled) {
+          setQuestions(result);
+          setRefreshKey((k) => k + 1);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err?.message ?? "Something went wrong.");
+      });
+
+    return () => { cancelled = true; };
+  }, [loadTrigger]);
 
   function handleYup(card) {
     if (isQuiz) {
-      if (card.answer == "Yes") {
-        setCorrectCounter(correctCounter + 1);
-        console.log(correctCounter);
-        return false;
+      if (card.answer === "Yes") {
+        correctRef.current += 1;
       } else {
-        setIncorrectIndexes([...incorrectIndexes, questions.indexOf(card)]);
-        console.log(correctCounter);
-        return false;
+        const idx = questions.indexOf(card);
+        incorrectRef.current = [...incorrectRef.current, idx];
       }
     }
     return false;
   }
+
   function handleNope(card) {
     if (isQuiz) {
-      if (card.answer == "No") {
-        setCorrectCounter(correctCounter + 1);
-        console.log(correctCounter);
-        return false;
+      if (card.answer === "No") {
+        correctRef.current += 1;
       } else {
-        setIncorrectIndexes([...incorrectIndexes, questions.indexOf(card)]);
-        console.log(correctCounter);
-        return false;
+        const idx = questions.indexOf(card);
+        incorrectRef.current = [...incorrectRef.current, idx];
       }
     }
     return false;
   }
-  const handleRefresh = () => {
-    console.log(correctCounter);
-    setRefreshKey(refreshKey + 1);
-    setCorrectCounter(0);
-    setIncorrectIndexes([])
+
+  const handleRetake = () => {
+    correctRef.current = 0;
+    incorrectRef.current = [];
+    setCorrectCount(0);
+    setIncorrectIndexes([]);
+    setRefreshKey((k) => k + 1);
   };
 
-  const handleReload = () => {
-    setQuestions([])
-    console.log(correctCounter);
-    setRefreshData(refreshData + 1);
-    setCorrectCounter(0);
-    setIncorrectIndexes([])
+  const handleNewQuestions = () => {
+    setLoadTrigger((t) => t + 1);
   };
+
+  const handleDone = () => {
+    // Flush refs → state so the result view has the final values
+    setCorrectCount(correctRef.current);
+    setIncorrectIndexes([...incorrectRef.current]);
+  };
+
+  const scoreMessage = () => {
+    const pct = correctCount / questions.length;
+    if (pct >= 0.8) return "Excellent! 🎉";
+    if (pct >= 0.5) return "Good job! 👍";
+    return "Keep practicing! 💪";
+  };
+
+  if (loadError) {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.cardsText, { marginBottom: 8 }]}>Oops 😬</Text>
+        <Text style={[styles.statusSubText, { marginBottom: 24 }]}>{loadError}</Text>
+        <TouchableOpacity style={styles.button} onPress={handleNewQuestions}>
+          <Text style={styles.buttonText}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (!questions.length) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={[styles.statusSubText, { marginTop: 16 }]}>
+          Generating questions…
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {questions && questions.length ? (
-        <SwipeCards
-          key={refreshKey}
-          cards={questions}
-          isFlip={questionType.quiz == "flip"}
-          renderCard={(cardData) =>
-            questionType.quiz == "flip" ? (
-              <FlipCard data={{ ...cardData, border: "black" }} />
-            ) : (
-              <Card data={{ ...cardData, border: "black" }} />
-            )
-          }
-          keyExtractor={(cardData) => String(cardData.question)}
-          renderNoMoreCards={() =>
-            isQuiz ? (
-              <>
-                <StatusCard text={`Result: ${correctCounter}/10`} />
+      <SwipeCards
+        key={refreshKey}
+        cards={questions}
+        isFlip={isFlip}
+        renderCard={(cardData) =>
+          isFlip ? (
+            <FlipCard data={{ ...cardData, border: "none" }} />
+          ) : (
+            <Card data={{ ...cardData, border: "none" }} />
+          )
+        }
+        handleNope={handleNope}
+        handleYup={handleYup}
+        neutral={!isQuiz}
+        renderNoMoreCards={() => {
+          if (isQuiz) {
+            // Flush on first render of result screen
+            const score = correctRef.current;
+            const total = questions.length;
+            const pct = score / total;
+            const msg =
+              pct >= 0.8 ? "Excellent! 🎉" : pct >= 0.5 ? "Good job! 👍" : "Keep practicing! 💪";
+            return (
+              <View style={{ alignItems: "center" }}>
+                <Text style={styles.scoreBig}>{score}</Text>
+                <Text style={styles.scoreOf}>out of {total}</Text>
+                <Text style={styles.scoreMessage}>{msg}</Text>
+
                 <TouchableOpacity
-                  style={{ ...styles.button }}
-                  onPress={() => {
+                  style={styles.button}
+                  onPress={() =>
                     navigation.navigate("QuizReviewScreen", {
-                      language: language,
-                      questionType: questionType,
-                      topic: topic,
-                      questions: questions,
-                      incorrectIndexes: incorrectIndexes,
-                    });
-                  }}
+                      questions,
+                      incorrectIndexes: incorrectRef.current,
+                    })
+                  }
                 >
-                  <Text>Review Answers</Text>
+                  <Text style={styles.buttonText}>Review Answers</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={{ ...styles.button }}
-                  onPress={handleRefresh}
+                  style={[styles.button, styles.buttonSecondary]}
+                  onPress={handleRetake}
                 >
-                  <Text>Retake</Text>
+                  <Text style={[styles.buttonText, styles.buttonTextSecondary]}>
+                    Try Again
+                  </Text>
                 </TouchableOpacity>
-
                 <TouchableOpacity
-                  style={{ ...styles.button }}
-                  onPress={handleReload}
+                  style={[styles.button, styles.buttonSecondary]}
+                  onPress={handleNewQuestions}
                 >
-                  <Text>Generate new questions</Text>
+                  <Text style={[styles.buttonText, styles.buttonTextSecondary]}>
+                    New Questions
+                  </Text>
                 </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                <StatusCard text="No more cards..." />
-
-                <TouchableOpacity
-                  style={{ ...styles.button }}
-                  onPress={handleReload}
-                >
-                  <Text>Generate new questions</Text>
-                </TouchableOpacity>
-              </>
-            )
+              </View>
+            );
           }
-          handleNope={handleNope}
-          handleYup={handleYup}
-          neutral={!isQuiz}
-        />
-      ) : (
-        <StatusCard text="Loading..." />
-      )}
+
+          return (
+            <View style={{ alignItems: "center" }}>
+              <Text style={[styles.cardsText, { marginBottom: 8 }]}>All done! 🎉</Text>
+              <Text style={[styles.statusSubText, { marginBottom: 24 }]}>
+                {isFlip ? "Come back to review any time." : "Hope that sparked some ideas!"}
+              </Text>
+              <TouchableOpacity style={styles.button} onPress={handleNewQuestions}>
+                <Text style={styles.buttonText}>New Questions</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonSecondary]}
+                onPress={handleRetake}
+              >
+                <Text style={[styles.buttonText, styles.buttonTextSecondary]}>
+                  Go Again
+                </Text>
+              </TouchableOpacity>
+            </View>
+          );
+        }}
+      />
     </View>
   );
 }
